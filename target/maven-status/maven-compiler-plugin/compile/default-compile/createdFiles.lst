@@ -1,3 +1,5 @@
+com/gcash/balance/CheckBalance.class
 com/gcash/auth/UserAuthentication.class
-com/gcash/main/Main.class
 com/gcash/database/DBConnection.class
+com/gcash/transaction/CashIn.class
+com/gcash/main/Main.class
