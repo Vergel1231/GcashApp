@@ -49,5 +49,33 @@ How to Run
 mvn compile
 mvn exec:java -Dexec.mainClass="com.gcash.main.Main"
 
-Next Steps
+Next Step
 Add Check Balance
+
+## Check Balance Feature
+### Description
+Allows authenticated users to view their current account balance, retrieved securely from the MySQL database using JDBC.
+### Implementation
+- `CheckBalance.java` in `com.gcash.balance` handles the logic.
+- Uses `PreparedStatement` to prevent SQL injection.
+- Returns `-1` if no balance record is found.
+### Usage
+After successful login, the app calls:
+```java
+CheckBalance cb = new CheckBalance();
+double balance = cb.checkBalance(userId);
+cb.close();
+
+Sample Output
+Login successful.
+Balance check successful.
+Virgilio's current balance: ₱1000.0
+User 1 logged out.
+
+Notes
+- Ensure a balance record exists for each user in the balance table.
+- Dummy data can be inserted via MySQL CLI:
+INSERT INTO balance (amount, user_id) VALUES (1000.00, 1);
+
+Next Step
+Add Cash In
