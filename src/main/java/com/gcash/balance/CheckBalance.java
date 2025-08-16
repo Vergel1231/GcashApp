@@ -6,8 +6,14 @@ import java.sql.*;
 public class CheckBalance {
     private Connection conn;
 
+    // Constructor injection: use external Connection
+    public CheckBalance(Connection externalConn) {
+        this.conn = externalConn;
+    }
+
+    // Default constructor: use internal DBConnection
     public CheckBalance() {
-        conn = DBConnection.getConnection();
+        this.conn = DBConnection.getConnection();
     }
 
     public double checkBalance(int userId) {

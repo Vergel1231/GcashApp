@@ -2,33 +2,36 @@ package com.gcash.main;
 
 import com.gcash.auth.UserAuthentication;
 import com.gcash.balance.CheckBalance;
+import com.gcash.database.DBConnection;
 import com.gcash.transaction.CashIn;
+import com.gcash.transaction.CashTransfer;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
         UserAuthentication auth = new UserAuthentication();
 
         // Login with correct PIN
-        int userId = auth.login("virgilio@example.com", "4321");
+        int userId = auth.login("alice@example.com", "1234");
 
         if (userId != -1) {
-            // Check balance
-            CheckBalance cb = new CheckBalance();
-            double balance = cb.checkBalance(userId);
+            try (
+                Connection conn = DBConnection.getConnection();
+                Scanner scanner = new Scanner(System.in);
+            ) {
+                // Check balance
+                CheckBalance cb = new CheckBalance(conn);
+                double balance = cb.checkBalance(userId);
 
-            if (balance >= 0) {
-                System.out.println("Balance check successful.");
-                System.out.println("Virgilio's current balance: ₱" + balance);
+                if (balance >= 0) {
+                    System.out.println("Balance check successful.");
+                    System.out.println("Virgilio's current balance: ₱" + balance);
 
-                // Cash-in logic
-                try (Connection conn = DriverManager.getConnection(
-                        "jdbc:mysql://localhost:3306/gcash", "root", "your_password")) {
-
+                    // Cash-in logic
                     CashIn cashIn = new CashIn(conn);
-
                     boolean firstTxn = cashIn.cashIn(userId, 200.00, "Initial cash-in");
                     boolean secondTxn = cashIn.cashIn(userId, 300.00, "Follow-up cash-in");
 
@@ -38,15 +41,21 @@ public class Main {
                         System.out.println("One or more cash-in transactions failed.");
                     }
 
-                } catch (Exception e) {
-                    e.printStackTrace();
+                    // Cash Transfer logic (interactive)
+                    CashTransfer transfer = new CashTransfer(conn);
+                    transfer.startTransferPrompt(userId, scanner);
+
+                } else {
+                    System.out.println("No balance record found.");
                 }
 
-            } else {
-                System.out.println("No balance record found.");
+                cb.close();
+
+            } catch (SQLException e) {
+                System.out.println("Database error:");
+                e.printStackTrace();
             }
 
-            cb.close();
             auth.logout(userId);
         } else {
             System.out.println("Login failed.");
