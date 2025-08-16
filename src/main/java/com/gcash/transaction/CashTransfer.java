@@ -33,7 +33,7 @@ public class CashTransfer {
                 if (success) break;
 
             } catch (NumberFormatException e) {
-                System.out.println("❌ Invalid input. Please enter numeric values or 'exit'.");
+                System.out.println("Invalid input. Please enter numeric values or 'exit'.");
             }
         }
     }
@@ -52,9 +52,9 @@ public class CashTransfer {
                 return false;
             }
 
-            // Restriction 3: Check if recipient exists
+            // Restriction 3: Check if recipient exists in users table
             PreparedStatement checkRecipient = conn.prepareStatement(
-                "SELECT COUNT(*) FROM user WHERE id = ?");
+                "SELECT COUNT(*) FROM users WHERE id = ?");
             checkRecipient.setInt(1, recipientId);
             ResultSet rs = checkRecipient.executeQuery();
             rs.next();
@@ -63,11 +63,21 @@ public class CashTransfer {
                 return false;
             }
 
+            // Preview sender balance
+            PreparedStatement getBalance = conn.prepareStatement(
+                "SELECT amount FROM balance WHERE user_id = ?");
+            getBalance.setInt(1, loggedInUserId);
+            ResultSet balanceRs = getBalance.executeQuery();
+            if (balanceRs.next()) {
+                double currentBalance = balanceRs.getDouble("amount");
+                System.out.printf("Your current balance: ₱%.2f%n", currentBalance);
+            }
+
             conn.setAutoCommit(false);
 
-            // Restriction 4: Check sender balance and debit
+            // Restriction 4: Debit sender
             PreparedStatement debit = conn.prepareStatement(
-                "UPDATE user SET balance = balance - ? WHERE id = ? AND balance >= ?");
+                "UPDATE balance SET amount = amount - ? WHERE user_id = ? AND amount >= ?");
             debit.setDouble(1, amount);
             debit.setInt(2, loggedInUserId);
             debit.setDouble(3, amount);
@@ -81,14 +91,14 @@ public class CashTransfer {
 
             // Credit recipient
             PreparedStatement credit = conn.prepareStatement(
-                "UPDATE user SET balance = balance + ? WHERE id = ?");
+                "UPDATE balance SET amount = amount + ? WHERE user_id = ?");
             credit.setDouble(1, amount);
             credit.setInt(2, recipientId);
             credit.executeUpdate();
 
             // Log transaction
             PreparedStatement log = conn.prepareStatement(
-                "INSERT INTO transaction (account_ID, type, amount, date, transferFromID, transferToID) " +
+                "INSERT INTO transaction (account_id, type, amount, date, transfer_from_id, transfer_to_id) " +
                 "VALUES (?, 'transfer', ?, NOW(), ?, ?)");
             log.setInt(1, loggedInUserId);
             log.setDouble(2, amount);
@@ -98,6 +108,8 @@ public class CashTransfer {
 
             conn.commit();
             System.out.println("Transfer successful.");
+            System.out.printf("[MILESTONE] ₱%.2f transferred from user %d to user %d%n",
+                              amount, loggedInUserId, recipientId);
             return true;
 
         } catch (SQLException e) {
