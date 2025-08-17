@@ -49,7 +49,7 @@ public class Main {
                     // View Transaction logic (interactive)
                     Transactions tx = new Transactions(conn);
                     while (true) {
-                        System.out.print("\n🔍 Enter transaction ID to view (or type 'exit' to cancel): ");
+                        System.out.print("\nEnter transaction ID to view (or type 'exit' to cancel): ");
                         String input = scanner.nextLine().trim();
 
                         if (input.equalsIgnoreCase("exit")) {
@@ -61,7 +61,7 @@ public class Main {
                             int txnId = Integer.parseInt(input);
                             tx.viewTransaction(txnId);
                         } catch (NumberFormatException e) {
-                            System.out.println("⚠️ Invalid input. Please enter a numeric transaction ID.");
+                            System.out.println("Invalid input. Please enter a numeric transaction ID.");
                         }
                     }
 
