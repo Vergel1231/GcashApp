@@ -153,6 +153,8 @@ Allows users to transfer funds from their account to another user. This operatio
     Sample Output
     Transfer successful. ₱250.0 sent from User 1 to User 3.
 
+---
+
 ## View Transaction by ID
 
 ### Description
@@ -168,5 +170,38 @@ Retrieves and displays a single transaction using its unique ID.
     --------------------------------------------------
     Account ID: 5 | Name: CashIn | Amount: 1000.00 | Date: 2025-08-17 23:59:59
 
+---
 
+## JDBC Interactivity Test via JShell
 
+This test validates live JDBC connectivity and transaction logic using JShell.
+
+### Prerequisites
+- MySQL running with schema `gcash_db`
+- JDBC connector installed manually (e.g., `mysql-connector-java-8.x.x.jar`)
+- Maven build completed (`mvn clean install`)
+- JShell available (`jshell` CLI)
+
+### Steps
+
+1. Launch JShell with JDBC and compiled classes:
+   ```bash
+   jshell --class-path target/classes:mysql-connector-java-8.x.x.jar
+
+2. Import and connect:
+import java.sql.DriverManager;
+var conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/gcash_db", "your_user", "your_pass");
+
+3. Instantiate and test:
+var tx = new Transactions(conn);
+tx.viewUserAll(1);
+
+### Expected Output
+Transactions for User ID: 1
+ID: 1 | Name: Initial cash-in | Amount: 200.00 | Date: 2025-08-16 01:36:37
+...
+
+Notes
+- Confirms schema alignment and JDBC readiness
+- Validates Transactions.java logic in isolation
+- Reproducible via CLI, no GUI dependencies
