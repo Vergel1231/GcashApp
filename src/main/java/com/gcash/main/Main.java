@@ -5,6 +5,7 @@ import com.gcash.balance.CheckBalance;
 import com.gcash.database.DBConnection;
 import com.gcash.transaction.CashIn;
 import com.gcash.transaction.CashTransfer;
+import com.gcash.transaction.Transactions;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -44,6 +45,25 @@ public class Main {
                     // Cash Transfer logic (interactive)
                     CashTransfer transfer = new CashTransfer(conn);
                     transfer.startTransferPrompt(userId, scanner);
+
+                    // View Transaction logic (interactive)
+                    Transactions tx = new Transactions(conn);
+                    while (true) {
+                        System.out.print("\n🔍 Enter transaction ID to view (or type 'exit' to cancel): ");
+                        String input = scanner.nextLine().trim();
+
+                        if (input.equalsIgnoreCase("exit")) {
+                            System.out.println("Returning to main flow...");
+                            break;
+                        }
+
+                        try {
+                            int txnId = Integer.parseInt(input);
+                            tx.viewTransaction(txnId);
+                        } catch (NumberFormatException e) {
+                            System.out.println("⚠️ Invalid input. Please enter a numeric transaction ID.");
+                        }
+                    }
 
                 } else {
                     System.out.println("No balance record found.");
