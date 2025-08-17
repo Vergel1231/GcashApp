@@ -19,13 +19,13 @@ public class Transactions {
         try (PreparedStatement stmt = conn.prepareStatement(query);
              ResultSet rs = stmt.executeQuery()) {
 
-            System.out.println("📄 All Transactions:");
+            System.out.println("All Transactions:");
             while (rs.next()) {
                 int id = rs.getInt("id");
                 int accountId = rs.getInt("account_id");
                 String name = rs.getString("name");
                 double amount = rs.getDouble("amount");
-                String createdAt = rs.getString("created_at");
+                String createdAt = rs.getString("date");
 
                 System.out.printf("ID: %d | Account ID: %d | Name: %s | Amount: %.2f | Date: %s%n",
                                   id, accountId, name, amount, createdAt);
@@ -48,7 +48,7 @@ public class Transactions {
                     int id = rs.getInt("id");
                     String name = rs.getString("name");
                     double amount = rs.getDouble("amount");
-                    String createdAt = rs.getString("created_at");
+                    String createdAt = rs.getString("date");
 
                     System.out.printf("ID: %d | Name: %s | Amount: %.2f | Date: %s%n",
                                       id, name, amount, createdAt);
@@ -71,7 +71,7 @@ public class Transactions {
                     int accountId = rs.getInt("account_id");
                     String name = rs.getString("name");
                     double amount = rs.getDouble("amount");
-                    String createdAt = rs.getString("created_at");
+                    String createdAt = rs.getString("date");
 
                     System.out.printf("Transaction ID: %d%n", transactionId);
                     System.out.printf("Account ID: %d | Name: %s | Amount: %.2f | Date: %s%n",
